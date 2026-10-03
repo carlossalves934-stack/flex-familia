@@ -15,6 +15,7 @@ Site do canal [Flex Família](https://www.youtube.com/@flexfamiliaonline): along
 | `npm test` | testes de unidade (Vitest) |
 | `npm run test:e2e` | testes de navegador (Playwright) |
 | `npm run build` | gera o site estático em `dist/` |
+| `npm run check` | verificação de tipos (Astro + TypeScript) |
 
 ## Conteúdo
 
