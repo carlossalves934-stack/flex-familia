@@ -52,3 +52,12 @@ test('menu sanfona abre no celular', async ({ page, isMobile }) => {
   await expect(page.locator('#nav')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Abrir menu' })).toHaveAttribute('aria-expanded', 'true');
 });
+
+test('cada vídeo tem uma página própria com player e benefícios', async ({ page }) => {
+  await page.goto('/videos/baleia');
+  await expect(page).toHaveTitle('A Baleia no Mar · Flex Família');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('A Baleia no Mar');
+  await expect(page.locator('.video-pagina iframe')).toHaveAttribute('src', /youtube-nocookie\.com\/embed\/EH-uvdTY2bs/);
+  await expect(page.locator('.video-pagina .beneficios li')).toHaveCount(3);
+  await expect(page.locator('.video-pagina .outros .card')).toHaveCount(3);
+});
