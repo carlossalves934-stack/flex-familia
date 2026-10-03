@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import Menu from '../../components/Menu.astro';
+import CardVideo from '../../components/CardVideo.astro';
+import PlayerSobreposto from '../../components/PlayerSobreposto.astro';
+import Rodape from '../../components/Rodape.astro';
+import { VIDEOS, CANAL_INSCREVER, rotuloCategoria, type Video } from '../../data/videos';
+import { HOST_PRIVADO } from '../../lib/youtube';
+import '../../styles/site.css';
+
+export function getStaticPaths() {
+  return VIDEOS.map(video => ({ params: { slug: video.slug }, props: { video } }));
+}
+interface Props { video: Video }
+const { video } = Astro.props;
+// Outros: primeiro da mesma categoria, depois o resto; sempre 3.
+const outros = [
+  ...VIDEOS.filter(v => v.categoria === video.categoria && v.slug !== video.slug),
+  ...VIDEOS.filter(v => v.categoria !== video.categoria),
+].slice(0, 3);
+---
+<Base titulo={`${video.titulo} · Flex Família`} descricao={`${video.titulo}: ${video.beneficios.join('. ')}.`} fontes="family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700">
+  <Menu />
+  <main class="video-pagina">
+    <div class="envolve">
+      <a class="voltar" href="/#historias">← Todas as histórias</a>
+      <div class="video-grade">
+        <div class="tela"><iframe src={`${HOST_PRIVADO}/embed/${video.id}?rel=0&modestbranding=1&playsinline=1`} title={video.titulo} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+        <div class="info">
+          <span class="olho">{rotuloCategoria(video)} · {video.duracao} min</span>
+          <h1>{video.titulo}</h1>
+          <div class="tags">{video.objetivos.map(o => <span>{o}</span>)}</div>
+          <ul class="beneficios">{video.beneficios.map(b => <li>{b}</li>)}</ul>
+          <div class="acoes">
+            {video.categoria !== 'adultos' && <a class="bt bt-crianca" href="/crianca">Fazer no Modo Criança</a>}
+            <a class="bt bt-primario" href={CANAL_INSCREVER} target="_blank" rel="noopener">Inscreva-se no canal</a>
+          </div>
+        </div>
+      </div>
+      <section class="outros">
+        <h2>Veja também</h2>
+        <div class="grade">{outros.map(v => <CardVideo video={v} />)}</div>
+      </section>
+    </div>
+  </main>
+  <Rodape />
+  <PlayerSobreposto />
+  <script>
+    import { iniciarSite } from '../../scripts/site';
+    iniciarSite();
+  </script>
+</Base>

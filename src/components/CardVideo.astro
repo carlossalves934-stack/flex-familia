@@ -1,0 +1,14 @@
+---
+import { capa, type Video } from '../data/videos';
+interface Props { video: Video }
+const { video } = Astro.props;
+---
+<a class="card" href={`/videos/${video.slug}`} data-id={video.id} data-obj={video.objetivos.join('|')}>
+  <div class="capa">
+    <img src={capa(video.id)} alt="" loading="lazy" />
+    <div class="play"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16l14-8z" fill="#f6ecd9"/></svg></span></div>
+    <span class="dur">{video.duracao}</span>
+  </div>
+  <h3>{video.titulo}</h3>
+  <div class="tags">{video.objetivos.map(o => <span>{o}</span>)}</div>
+</a>

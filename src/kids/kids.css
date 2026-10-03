@@ -1,0 +1,181 @@
+/* Conceito: um livro de histórias aberto sobre a mesa; cada tela é uma página de papel. */
+:root{
+  --papel:#f6ecd9; --papel-2:#efe0c4; --papel-3:#e4d0ab;
+  --terracota:#b5543a; --salvia:#7f9c96; --mostarda:#d9a441; --tinta:#4a3a2a;
+  --rosa:#d98f7e; --agua:#8fb3bf; --mesa:#6e5640;
+  --f-mao:'Gaegu','Comic Sans MS',cursive;
+  --f-texto:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --toque:72px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--mesa);
+  background-image:repeating-linear-gradient(92deg,rgba(0,0,0,.05) 0 2px,transparent 2px 38px),
+                   repeating-linear-gradient(88deg,rgba(255,255,255,.03) 0 1px,transparent 1px 23px);
+  color:var(--tinta);font-family:var(--f-texto);
+  -webkit-tap-highlight-color:transparent;overflow:hidden;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,a:focus-visible{outline:4px dashed var(--terracota);outline-offset:4px}
+.oculto{display:none!important}
+
+#app{height:100%;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 16px max(10px,env(safe-area-inset-bottom))}
+
+/* Barra superior: ícones grandes, sem texto obrigatório */
+.barra{display:flex;align-items:center;gap:12px;flex:0 0 auto;padding-bottom:10px}
+.barra .espaco{flex:1}
+.bt-icone{
+  width:var(--toque);height:var(--toque);border-radius:50%;
+  background:var(--papel);display:grid;place-items:center;position:relative;
+  box-shadow:0 3px 0 var(--papel-3),0 6px 14px rgba(0,0,0,.25);
+  transition:transform .15s;
+}
+.bt-icone:active{transform:translateY(3px) scale(.96);box-shadow:0 0 0 var(--papel-3),0 3px 8px rgba(0,0,0,.25)}
+.bt-icone svg{width:42px;height:42px}
+.bt-icone.destaque{background:var(--mostarda)}
+.bt-icone .anel{position:absolute;inset:-6px;transform:rotate(-90deg)}
+.bt-icone .anel circle{fill:none;stroke:var(--terracota);stroke-width:6;stroke-dasharray:264;stroke-dashoffset:264;stroke-linecap:round}
+.bt-pais{width:56px;height:56px;opacity:.85}
+.bt-pais svg{width:30px;height:30px}
+
+/* Telas */
+.tela{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Livro */
+.livro{position:relative;width:min(100%,980px);height:100%;max-height:640px;perspective:1600px}
+.pagina{
+  position:absolute;inset:0;border-radius:6px 16px 16px 6px;overflow:hidden;
+  background:var(--papel);
+  background-image:radial-gradient(rgba(120,90,50,.07) 1px,transparent 1px);background-size:5px 5px;
+  box-shadow:inset 26px 0 30px -18px rgba(74,58,42,.45),0 2px 0 var(--papel-2),0 4px 0 var(--papel-3),0 18px 40px rgba(0,0,0,.35);
+  transform-origin:left center;
+}
+.pagina.vira-prox{animation:viraProx .55s ease-in-out}
+.pagina.vira-ant{animation:viraAnt .55s ease-in-out}
+@keyframes viraProx{0%{transform:rotateY(0)}50%{transform:rotateY(-80deg);filter:brightness(.8)}51%{transform:rotateY(80deg)}100%{transform:rotateY(0)}}
+@keyframes viraAnt{0%{transform:rotateY(0)}50%{transform:rotateY(80deg);filter:brightness(.8)}51%{transform:rotateY(-80deg)}100%{transform:rotateY(0)}}
+.cenario{position:absolute;inset:0;width:100%;height:100%}
+.pagina h1{
+  position:relative;margin:18px 0 0;text-align:center;font-family:var(--f-mao);font-weight:700;
+  font-size:clamp(34px,6vw,58px);line-height:1;color:var(--terracota);text-wrap:balance;
+}
+.personagens{
+  position:absolute;left:0;right:0;bottom:0;top:90px;
+  display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:clamp(10px,3vw,36px);padding:12px 70px 40px;
+}
+.personagem{position:relative;width:clamp(120px,20vw,190px);display:flex;flex-direction:column;align-items:center;gap:4px}
+.personagem .figura{width:100%;aspect-ratio:1;max-width:100%;transition:transform .2s}
+.personagem .figura svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 4px rgba(74,58,42,.18))}
+.personagem .nome{font-family:var(--f-mao);font-weight:700;font-size:22px;line-height:1;text-align:center;background:rgba(246,236,217,.85);padding:2px 8px;border-radius:8px}
+.personagem .estrela{position:absolute;top:2px;right:6px;width:40px;height:40px}
+.personagem .play{
+  position:absolute;top:34%;left:50%;width:84px;height:84px;margin-left:-42px;border-radius:50%;
+  background:var(--terracota);display:grid;place-items:center;box-shadow:0 4px 0 #8a3c27,0 10px 20px rgba(0,0,0,.3);
+  transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1);pointer-events:none;
+}
+.personagem .play svg{width:44px;height:44px}
+.personagem.escolhido .play{transform:scale(1);pointer-events:auto}
+.personagem.escolhido .figura{transform:scale(1.06)}
+.balanca{animation:balanca .7s ease-in-out}
+@keyframes balanca{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg) translateY(-8px)}45%{transform:rotate(7deg) translateY(-4px)}70%{transform:rotate(-4deg)}}
+
+.orelha{position:absolute;bottom:0;width:96px;height:96px;z-index:2}
+.orelha.prox{right:0;background:linear-gradient(135deg,transparent 50%,var(--papel-3) 50%,var(--papel-2) 75%);border-radius:0 0 16px 0}
+.orelha.ant{left:0;background:linear-gradient(225deg,transparent 50%,var(--papel-3) 50%,var(--papel-2) 75%);border-radius:0 0 0 6px}
+.orelha svg{position:absolute;width:34px;height:34px;bottom:12px}
+.orelha.prox svg{right:12px}.orelha.ant svg{left:12px}
+.orelha.prox{animation:acena 2.6s ease-in-out infinite}
+@keyframes acena{0%,80%,100%{transform:none}88%{transform:translate(-4px,-4px)}}
+.pontos{display:flex;gap:10px;justify-content:center;padding-top:12px;flex:0 0 auto}
+.pontos span{width:14px;height:14px;border-radius:50%;background:var(--papel-3);opacity:.6}
+.pontos span.atual{background:var(--mostarda);opacity:1}
+
+/* Player */
+.moldura{
+  position:relative;width:min(100%,920px);max-height:calc(100% - 120px);aspect-ratio:16/9;
+  background:#1d1712;padding:10px;border-radius:6px;transform:rotate(-.6deg);
+  box-shadow:0 18px 40px rgba(0,0,0,.4);
+}
+.moldura::before,.moldura::after{content:"";position:absolute;width:110px;height:30px;background:rgba(239,224,196,.8);z-index:3}
+.moldura::before{top:-12px;left:-26px;transform:rotate(-30deg)}
+.moldura::after{bottom:-12px;right:-26px;transform:rotate(-30deg)}
+#yt,#yt iframe{width:100%;height:100%;display:block;border-radius:2px}
+.cobre{position:absolute;inset:10px;z-index:2}
+.aviso-video{position:absolute;inset:10px;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  background:var(--papel);text-align:center;font-family:var(--f-mao);font-size:28px;padding:20px}
+.aviso-video svg{width:120px;height:120px}
+.controles{display:flex;gap:24px;align-items:center;justify-content:center;padding-top:22px;flex:0 0 auto}
+.bt-grande{width:96px;height:96px}
+.bt-grande svg{width:54px;height:54px}
+.bt-teste{font-size:13px;font-weight:800;color:var(--papel);opacity:.75;text-decoration:underline;padding:8px}
+
+/* Festa */
+.festa{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.festa h2{font-family:var(--f-mao);font-weight:700;font-size:clamp(52px,10vw,96px);line-height:.9;margin:0;color:var(--papel);text-shadow:0 4px 0 var(--terracota)}
+.adesivo{
+  width:clamp(150px,30vw,220px);aspect-ratio:1;border-radius:50%;background:var(--papel);
+  border:6px solid var(--mostarda);box-shadow:0 0 0 4px var(--papel),0 14px 30px rgba(0,0,0,.35);
+  display:grid;place-items:center;padding:14px;
+}
+.adesivo svg{width:100%;height:100%}
+.carimba{animation:carimba .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes carimba{0%{transform:scale(2.4) rotate(-25deg);opacity:0}60%{transform:scale(.92) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(-4deg)}}
+.festa .botoes{display:flex;gap:24px;padding-top:18px}
+#confete{position:fixed;inset:0;pointer-events:none;z-index:50}
+.dupla{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.cartao-pessoa{width:150px;padding:14px 10px;border-radius:14px;background:var(--papel);display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:0 4px 0 var(--papel-3),0 10px 20px rgba(0,0,0,.25);border:4px dashed var(--papel-3);transition:transform .15s}
+.cartao-pessoa svg.fig{width:84px;height:84px}
+.cartao-pessoa svg.est{width:44px;height:44px;opacity:.25;transition:opacity .2s,transform .3s}
+.cartao-pessoa.feito{border:4px solid var(--mostarda)}
+.cartao-pessoa.feito svg.est{opacity:1;transform:scale(1.2) rotate(15deg)}
+.cartao-pessoa span{font-family:var(--f-mao);font-weight:700;font-size:26px}
+
+/* Folha (álbum, família, pais) */
+.folha{
+  width:min(100%,980px);height:100%;overflow:auto;border-radius:8px;padding:22px clamp(16px,4vw,40px) 40px;
+  background:var(--papel);background-image:radial-gradient(rgba(120,90,50,.07) 1px,transparent 1px);background-size:5px 5px;
+  box-shadow:0 2px 0 var(--papel-2),0 4px 0 var(--papel-3),0 18px 40px rgba(0,0,0,.35);
+}
+.folha h1{font-family:var(--f-mao);font-weight:700;font-size:clamp(38px,6vw,56px);color:var(--terracota);margin:0 0 6px;line-height:1;text-align:center}
+.folha .sub{font-family:var(--f-mao);font-size:24px;text-align:center;margin:0 0 18px}
+.grade-adesivos{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:18px;justify-items:center}
+.grade-adesivos .adesivo{width:110px;padding:10px;border-width:4px;box-shadow:0 0 0 3px var(--papel),0 6px 12px rgba(0,0,0,.2)}
+.grade-adesivos .vazio{border:4px dashed var(--papel-3);background:transparent;box-shadow:none}
+.grade-adesivos .vazio svg{filter:grayscale(1) brightness(.4);opacity:.14}
+.grade-adesivos .adesivo:nth-child(3n){transform:rotate(-5deg)}.grade-adesivos .adesivo:nth-child(3n+1){transform:rotate(4deg)}
+.secao-titulo{font-family:var(--f-mao);font-weight:700;font-size:30px;margin:28px 0 12px;text-align:center;color:var(--salvia)}
+.desafios{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px}
+.desafio{background:var(--papel-2);border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:0 4px 0 var(--papel-3);transition:transform .15s}
+.desafio:active{transform:scale(.97)}
+.desafio .figura{width:130px;height:130px}
+.desafio .nome{font-family:var(--f-mao);font-weight:700;font-size:28px;line-height:1}
+.desafio .duo{display:flex;gap:6px;align-items:center;font-family:var(--f-mao);font-size:20px}
+.desafio .duo svg{width:30px;height:30px}
+
+
+/* Barreira dos pais */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(29,23,18,.6);display:grid;place-items:center;padding:16px}
+.modal .caixa{background:var(--papel);border-radius:16px;padding:26px;max-width:380px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.modal h3{font-family:var(--f-mao);font-size:32px;margin:0 0 6px;color:var(--terracota)}
+.modal p{margin:0 0 18px}
+.segurar{width:150px;height:150px;border-radius:50%;margin:0 auto;position:relative;background:var(--papel-2);display:grid;place-items:center;
+  box-shadow:0 4px 0 var(--papel-3);touch-action:none;user-select:none;-webkit-user-select:none;font-weight:800}
+.segurar svg.anel{position:absolute;inset:0;transform:rotate(-90deg)}
+.segurar svg.anel circle{fill:none;stroke:var(--terracota);stroke-width:10;stroke-dasharray:440;stroke-dashoffset:440;stroke-linecap:round}
+.modal .fechar{margin-top:16px;text-decoration:underline;font-weight:600}
+
+@media (max-width:560px){
+  :root{--toque:64px}
+  .barra{gap:8px}
+  .personagens{padding:8px 16px 96px;top:76px;gap:8px 14px}
+  .personagem{width:42%}
+  .orelha{width:80px;height:80px}
+  .pais .professora{grid-template-columns:1fr;justify-items:center;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
