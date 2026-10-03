@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 // Testes não dependem da internet: YouTube e capas ficam bloqueados.
 test.beforeEach(async ({ page }) => {
-  await page.route(/youtube|ytimg|googlevideo/, r => r.abort());
+  await page.route(/^https?:\/\/([^/]*\.)?(youtube(-nocookie)?\.com|ytimg\.com|googlevideo\.com)\//, r => r.abort());
 });
 
 test('página dos pais mostra a abertura e as 10 histórias', async ({ page }) => {

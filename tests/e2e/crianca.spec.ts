@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-  await page.route(/youtube|ytimg|googlevideo/, r => r.abort());
+  await page.route(/^https?:\/\/([^/]*\.)?(youtube(-nocookie)?\.com|ytimg\.com|googlevideo\.com)\//, r => r.abort());
 });
 
 test('assistir uma história dá um adesivo que fica no álbum', async ({ page }) => {
@@ -52,4 +52,23 @@ test('segurar o cadeado por 3 segundos leva ao site dos pais', async ({ page }) 
   await alvo.hover();
   await page.mouse.down();
   await page.waitForURL('/', { timeout: 6000 });
+});
+
+test('voltar antes da API do YouTube chegar não cria player escondido', async ({ page }) => {
+  await page.route('https://www.youtube.com/iframe_api', async route => {
+    await new Promise(r => setTimeout(r, 800));
+    await route.fulfill({
+      contentType: 'text/javascript',
+      body: `window.YT = { Player: class { constructor() { window.__criados = (window.__criados || 0) + 1; } playVideo() {} pauseVideo() {} stopVideo() {} loadVideoById() {} }, PlayerState: { ENDED: 0, PLAYING: 1, PAUSED: 2 } };
+        window.onYouTubeIframeAPIReady && window.onYouTubeIframeAPIReady();`,
+    });
+  });
+  await page.goto('/crianca');
+  await page.getByRole('button', { name: 'A Lebre e a Tartaruga', exact: true }).click();
+  await page.getByRole('button', { name: 'Assistir A Lebre e a Tartaruga' }).click();
+  await expect(page.locator('#tela-video')).toBeVisible();
+  await page.locator('#bt-voltar-video').click();
+  await expect(page.getByRole('heading', { name: 'Floresta' })).toBeVisible();
+  await page.waitForTimeout(1500);
+  expect(await page.evaluate(() => (window as unknown as { __criados?: number }).__criados ?? 0)).toBe(0);
 });

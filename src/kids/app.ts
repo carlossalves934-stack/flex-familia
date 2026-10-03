@@ -20,18 +20,20 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
   let videoAtual: Video | null = null;
   let player: YTPlayer | null = null;
   let tocando = false;
+  let telaAtual: Tela = 'mundo';
 
   $('bt-fim').classList.toggle('oculto', !opcoes.teste);
 
   /* ---------- Navegação ---------- */
   function ir(tela: Tela) {
+    telaAtual = tela;
     TELAS.forEach(t => $('tela-' + t).classList.toggle('oculto', t !== tela));
     const naCasa = tela === 'mundo';
     $('bt-casa').classList.toggle('oculto', naCasa || tela === 'video');
     $('bt-album').classList.toggle('oculto', !naCasa);
     $('bt-familia').classList.toggle('oculto', !naCasa);
     $('bt-pais').classList.toggle('oculto', tela === 'video');
-    if (tela !== 'video') pararVideo();
+    if (tela !== 'video') { pararVideo(); videoAtual = null; }
     if (naCasa) desenharPagina();
   }
 
@@ -103,7 +105,8 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
     voz.calar();
     if (player) { player.loadVideoById(v.id); return; }
     carregarYouTube().then(YT => {
-      if (videoAtual !== v || player) { player?.loadVideoById(videoAtual!.id); return; }
+      if (telaAtual !== 'video' || videoAtual !== v) return;
+      if (player) { player.loadVideoById(v.id); return; }
       player = new YT.Player('yt', {
         host: HOST_PRIVADO,
         videoId: v.id,
@@ -130,10 +133,11 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
     tocando = false;
   }
   function fimDoVideo() {
+    const v = videoAtual;
     pararVideo();
-    if (!videoAtual) return;
-    if (videoAtual.categoria === 'desafio') festaDesafio(videoAtual);
-    else festaHistoria(videoAtual);
+    if (!v || telaAtual !== 'video') return;
+    if (v.categoria === 'desafio') festaDesafio(v);
+    else festaHistoria(v);
   }
   $('cobre').onclick = alternarPlay;
   $('bt-playpause').onclick = alternarPlay;
