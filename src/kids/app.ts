@@ -4,6 +4,7 @@ import { criarSegurar } from '../lib/segurar';
 import { criarSons } from '../lib/sons';
 import { criarVoz } from '../lib/voz';
 import { carregarYouTube, HOST_PRIVADO, type YTPlayer } from '../lib/youtube';
+import { esc } from '../lib/html';
 import { ARTE, CENARIOS, I, arte } from './arte';
 
 type Tela = 'mundo' | 'video' | 'festa' | 'album' | 'familia';
@@ -19,6 +20,8 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
   let paginaAtual = 0;
   let videoAtual: Video | null = null;
   let player: YTPlayer | null = null;
+  let pronto = false;
+  let idCriado = '';
   let tocando = false;
   let telaAtual: Tela = 'mundo';
 
@@ -42,13 +45,13 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
     const p = PAGINAS[paginaAtual];
     const itens = historias.filter(v => v.pagina === paginaAtual);
     const el = $('pagina');
-    el.innerHTML = CENARIOS[p.cenario] + `<h1>${p.nome}</h1>
+    el.innerHTML = CENARIOS[p.cenario] + `<h1>${esc(p.nome)}</h1>
       <div class="personagens">${itens.map(v => `
         <div class="personagem" data-slug="${v.slug}">
-          <button class="figura" aria-label="${v.titulo}">${arte(v.slug)}</button>
-          <span class="nome" aria-hidden="true">${v.titulo}</span>
+          <button class="figura" aria-label="${esc(v.titulo)}">${arte(v.slug)}</button>
+          <span class="nome" aria-hidden="true">${esc(v.titulo)}</span>
           ${progresso.temAdesivo(v.slug) ? `<span class="estrela">${I.estrela}</span>` : ''}
-          <button class="play" aria-label="Assistir ${v.titulo}">${I.play}</button>
+          <button class="play" aria-label="Assistir ${esc(v.titulo)}">${I.play}</button>
         </div>`).join('')}
       </div>
       ${paginaAtual > 0 ? `<button class="orelha ant" aria-label="Página anterior">${I.setaE}</button>` : ''}
@@ -103,16 +106,22 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
     $('bt-voltar-video').innerHTML = I.casa;
     $('bt-playpause').innerHTML = I.play;
     voz.calar();
-    if (player) { player.loadVideoById(v.id); return; }
+    if (player) { if (pronto) player.loadVideoById(v.id); return; }
     carregarYouTube().then(YT => {
       if (telaAtual !== 'video' || videoAtual !== v) return;
-      if (player) { player.loadVideoById(v.id); return; }
+      if (player) { if (pronto) player.loadVideoById(v.id); return; }
+      idCriado = v.id;
       player = new YT.Player('yt', {
         host: HOST_PRIVADO,
         videoId: v.id,
         playerVars: { rel: 0, modestbranding: 1, playsinline: 1, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, autoplay: 1 },
         events: {
-          onReady: (e: { target: YTPlayer }) => e.target.playVideo(),
+          onReady: (e: { target: YTPlayer }) => {
+            pronto = true;
+            if (telaAtual === 'video' && videoAtual) {
+              if (videoAtual.id !== idCriado) e.target.loadVideoById(videoAtual.id); else e.target.playVideo();
+            } else e.target.stopVideo();
+          },
           onStateChange: (e: { data: number }) => {
             tocando = e.data === YT.PlayerState.PLAYING;
             $('bt-playpause').innerHTML = tocando ? I.pause : I.play;
@@ -125,11 +134,11 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
   }
 
   function alternarPlay() {
-    if (!player) return;
+    if (!player || !pronto) return;
     if (tocando) player.pauseVideo(); else player.playVideo();
   }
   function pararVideo() {
-    try { player?.stopVideo(); } catch { /* player ainda não existe */ }
+    if (pronto) { try { player?.stopVideo(); } catch { /* player indisponível */ } }
     tocando = false;
   }
   function fimDoVideo() {
@@ -154,7 +163,7 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
       <div class="botoes">
         <button class="bt-icone bt-grande" id="f-casa" aria-label="Voltar para o livro">${I.casa}</button>
         <button class="bt-icone bt-grande" id="f-album" aria-label="Ver meu álbum">${I.album}</button>
-        <button class="bt-icone bt-grande destaque" id="f-mais" aria-label="Mais uma história: ${prox.titulo}">${I.mais}</button>
+        <button class="bt-icone bt-grande destaque" id="f-mais" aria-label="Mais uma história: ${esc(prox.titulo)}">${I.mais}</button>
       </div>`;
     som.festa(); setTimeout(() => som.carimbo(), 350); confete();
     voz.falar(novo ? `Muito bem! Você ganhou o adesivo ${v.titulo}!` : 'Muito bem! Que alongamento lindo!');
@@ -224,11 +233,11 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
     $('album').innerHTML = `<h1>Meu Álbum</h1>
       <p class="sub">${n} de ${historias.length} histórias</p>
       <div class="grade-adesivos">${historias.map(h => `
-        <button class="adesivo ${progresso.temAdesivo(h.slug) ? '' : 'vazio'}" data-slug="${h.slug}" aria-label="${h.titulo}">${arte(h.slug)}</button>`).join('')}
+        <button class="adesivo ${progresso.temAdesivo(h.slug) ? '' : 'vazio'}" data-slug="${h.slug}" aria-label="${esc(h.titulo)}">${arte(h.slug)}</button>`).join('')}
       </div>
       <div class="secao-titulo">Adesivos da Família · ${nf} de ${desafios.length}</div>
       <div class="grade-adesivos">${desafios.map(d => `
-        <button class="adesivo ${progresso.temFamilia(d.slug) ? '' : 'vazio'}" data-slug="${d.slug}" aria-label="${d.titulo}">${arte(progresso.temFamilia(d.slug) ? 'familia' : d.slug)}</button>`).join('')}
+        <button class="adesivo ${progresso.temFamilia(d.slug) ? '' : 'vazio'}" data-slug="${d.slug}" aria-label="${esc(d.titulo)}">${arte(progresso.temFamilia(d.slug) ? 'familia' : d.slug)}</button>`).join('')}
       </div>`;
     voz.falar(n === 0 ? 'Seu álbum está esperando os primeiros adesivos!' : `Você já tem ${n} adesivos!`);
     $('album').querySelectorAll<HTMLButtonElement>('.adesivo').forEach(b => {
@@ -246,10 +255,10 @@ export function iniciarModoCrianca(opcoes: { teste: boolean }) {
     $('familia').innerHTML = `<h1>Modo Família</h1>
       <p class="sub">Criança e adulto fazem juntos!</p>
       <div class="desafios">${desafios.map(d => `
-        <button class="desafio" data-slug="${d.slug}" aria-label="Desafio ${d.titulo}">
+        <button class="desafio" data-slug="${d.slug}" aria-label="Desafio ${esc(d.titulo)}">
           <div class="figura">${arte(d.slug)}</div>
-          <span class="nome">${d.titulo}</span>
-          <span class="duo">${progresso.temFamilia(d.slug) ? I.estrela + I.estrela + ' feito!' : d.duracao}</span>
+          <span class="nome">${esc(d.titulo)}</span>
+          <span class="duo">${progresso.temFamilia(d.slug) ? I.estrela + I.estrela + ' feito!' : esc(d.duracao)}</span>
         </button>`).join('')}
       </div>`;
     voz.falar('Modo Família! Escolha um desafio para fazer junto com um adulto.');

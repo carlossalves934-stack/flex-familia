@@ -16,10 +16,15 @@ function iniciarPlayer() {
     const v = porId(id);
     if (!v) return false;
     ultimoFoco = document.activeElement as HTMLElement | null;
-    $('player-tela')!.innerHTML = `<iframe src="${HOST_PRIVADO}/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="${v.titulo}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    const quadro = document.createElement('iframe');
+    quadro.src = `${HOST_PRIVADO}/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+    quadro.title = v.titulo;
+    quadro.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    quadro.allowFullscreen = true;
+    $('player-tela')!.replaceChildren(quadro);
     $('player-titulo')!.textContent = v.titulo;
     $('player-meta')!.textContent = `${rotuloCategoria(v)} · ${v.duracao} min`;
-    $('player-beneficios')!.innerHTML = v.beneficios.map(b => `<li>${b}</li>`).join('');
+    $('player-beneficios')!.replaceChildren(...v.beneficios.map(b => { const li = document.createElement('li'); li.textContent = b; return li; }));
     $<HTMLAnchorElement>('player-yt')!.href = `https://www.youtube.com/watch?v=${v.id}`;
     player.classList.remove('oculto');
     document.body.style.overflow = 'hidden';

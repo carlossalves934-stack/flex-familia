@@ -61,3 +61,9 @@ test('cada vídeo tem uma página própria com player e benefícios', async ({ p
   await expect(page.locator('.video-pagina .beneficios li')).toHaveCount(3);
   await expect(page.locator('.video-pagina .outros .card')).toHaveCount(3);
 });
+
+test('título com aspas não quebra o atributo do iframe', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#grade-adultos .card', { hasText: 'Soltar Quadril' }).click();
+  await expect(page.getByRole('dialog').locator('iframe')).toHaveAttribute('title', 'Sequência para "Soltar Quadril"');
+});
