@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+import '../kids/kids.css';
+---
+<Base titulo="Modo Criança · Flex Família" descricao="Histórias para alongar: escolha um personagem, assista e ganhe adesivos." fontes="family=Gaegu:wght@400;700&family=Nunito:wght@400;600;800">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="aq" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4" result="r"/>
+        <feDisplacementMap in="SourceGraphic" in2="r" scale="5" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -.9 1" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="app">
+    <header class="barra">
+      <button class="bt-icone oculto" id="bt-casa" aria-label="Voltar para o livro"></button>
+      <button class="bt-icone" id="bt-album" aria-label="Meu álbum de adesivos"></button>
+      <button class="bt-icone destaque" id="bt-familia" aria-label="Modo Família"></button>
+      <div class="espaco"></div>
+      <button class="bt-icone" id="bt-som" aria-label="Som ligado ou desligado"></button>
+      <button class="bt-icone bt-pais" id="bt-pais" aria-label="Área dos adultos"></button>
+    </header>
+
+    <section class="tela" id="tela-mundo">
+      <div class="livro"><div class="pagina" id="pagina"></div></div>
+      <div class="pontos" id="pontos"></div>
+    </section>
+
+    <section class="tela oculto" id="tela-video">
+      <div class="moldura">
+        <div id="yt"></div>
+        <div class="cobre" id="cobre" aria-hidden="true"></div>
+        <div class="aviso-video oculto" id="aviso-video"></div>
+      </div>
+      <div class="controles">
+        <button class="bt-icone bt-grande" id="bt-voltar-video" aria-label="Voltar"></button>
+        <button class="bt-icone bt-grande destaque" id="bt-playpause" aria-label="Tocar ou pausar"></button>
+        <button class="bt-teste oculto" id="bt-fim">teste: pular para o fim</button>
+      </div>
+    </section>
+
+    <section class="tela oculto" id="tela-festa"><div class="festa" id="festa"></div></section>
+    <section class="tela oculto" id="tela-album"><div class="folha" id="album"></div></section>
+    <section class="tela oculto" id="tela-familia"><div class="folha" id="familia"></div></section>
+  </div>
+
+  <div class="modal oculto" id="barreira" role="dialog" aria-modal="true" aria-labelledby="barreira-titulo">
+    <div class="caixa">
+      <h3 id="barreira-titulo">Só para adultos</h3>
+      <p>Segure o botão por 3 segundos para ir ao site dos pais.</p>
+      <div class="segurar" id="segurar" role="button" tabindex="0" aria-label="Segure para entrar">
+        <svg class="anel" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70"/></svg>
+        <span>Segure</span>
+      </div>
+      <button class="fechar" id="barreira-fechar">Cancelar</button>
+    </div>
+  </div>
+
+  <canvas id="confete"></canvas>
+
+  <script>
+    import { iniciarModoCrianca } from '../kids/app';
+    iniciarModoCrianca({ teste: new URLSearchParams(location.search).has('teste') });
+  </script>
+</Base>
