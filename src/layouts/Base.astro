@@ -1,0 +1,19 @@
+---
+interface Props { titulo: string; descricao: string; fontes: string }
+const { titulo, descricao, fontes } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?${fontes}&display=swap`} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

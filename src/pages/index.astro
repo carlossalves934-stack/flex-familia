@@ -1,1 +1,143 @@
-<h1>Flex Família</h1>
+---
+import Base from '../layouts/Base.astro';
+import Menu from '../components/Menu.astro';
+import CardVideo from '../components/CardVideo.astro';
+import PlayerSobreposto from '../components/PlayerSobreposto.astro';
+import Rodape from '../components/Rodape.astro';
+import { historias, desafios, adultos, destaques, capa, faixaMinutos, CANAL_INSCREVER, pendentesDeRevisao } from '../data/videos';
+import { listarObjetivos, TODAS } from '../lib/filtros';
+import '../styles/site.css';
+
+const faixa = faixaMinutos(historias);
+const objetivos = listarObjetivos(historias);
+const pendentes = pendentesDeRevisao();
+if (import.meta.env.PROD && pendentes.length) {
+  console.warn(`[revisão] ${pendentes.length} vídeos com textos ainda não revisados pela professora: ${pendentes.map(v => v.slug).join(', ')}`);
+}
+---
+<Base titulo="Flex Família" descricao="Alongamento infantil com histórias: vídeos curtos guiados pela professora do canal Flex Família, para crianças de 3 a 6 anos." fontes="family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700">
+  <Menu />
+  <main id="topo">
+    <section class="abertura" aria-label="Apresentação">
+      <div class="fundo" id="fundo">
+        {destaques.map((v, i) => <img src={capa(v.id, 'maxresdefault')} alt="" class={i === 0 ? 'ativa' : ''} data-id={v.id} data-titulo={v.titulo} />)}
+      </div>
+      <div class="bgvideo" id="bgvideo"><div id="bg-yt"></div></div>
+      <div class="veu"></div>
+      <div class="envolve">
+        <div class="conteudo">
+          <span class="olho">Canal Flex Família · alongamento infantil</span>
+          <h1>Alongamento infantil <em>com histórias</em></h1>
+          <p>Vídeos curtos em que a criança se alonga enquanto escuta uma história contada pela professora. Para fazer em casa, sem equipamento e sem cadastro.</p>
+          <div class="acoes">
+            <a class="bt bt-primario" href="#historias"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>Ver as histórias</a>
+            <a class="bt bt-vazado" href="/crianca">Abrir o Modo Criança</a>
+          </div>
+          <div class="chips"><span>Equilíbrio</span><span>Calma</span><span>Postura</span><span>Imaginação</span><span>3 a 6 anos</span></div>
+        </div>
+      </div>
+      <button class="agora" id="agora" aria-label="Assistir o vídeo em destaque">
+        <img src={capa(destaques[0].id)} alt="" />
+        <span><small>Agora na tela</small><span id="agora-titulo">{destaques[0].titulo}</span>
+          <span class="barrinhas">{destaques.map((_, i) => <i class={i === 0 ? 'on' : ''}></i>)}</span></span>
+      </button>
+    </section>
+
+    <section class="numeros" aria-label="Em números">
+      <div class="envolve">
+        <div><b>{historias.length}</b><span>histórias para alongar</span></div>
+        <div><b>{faixa.min}–{faixa.max} min</b><span>cabem em qualquer rotina</span></div>
+        <div><b>3 a 6</b><span>anos, com adulto por perto</span></div>
+        <div><b>0</b><span>cadastros ou dados coletados</span></div>
+      </div>
+    </section>
+
+    <section class="secao" id="historias">
+      <div class="envolve">
+        <div class="cabeca">
+          <div>
+            <span class="olho">Histórias para alongar</span>
+            <h2>Escolha pelo que seu filho precisa agora</h2>
+            <p class="lead">Cada história trabalha uma parte do corpo e um jeito de estar: mais calmo, mais firme, mais solto.</p>
+          </div>
+        </div>
+        <div class="filtros" id="filtros" role="group" aria-label="Filtrar por objetivo">
+          {objetivos.map(o => <button class="filtro" aria-pressed={o === TODAS ? 'true' : 'false'} data-obj={o}>{o}</button>)}
+        </div>
+        <div class="grade" id="grade-historias">
+          {historias.map(v => <CardVideo video={v} />)}
+          <p class="vazio-filtro oculto" id="vazio">Nenhuma história com essa etiqueta ainda.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao papel" id="porque">
+      <div class="envolve">
+        <span class="olho">Por que funciona</span>
+        <h2>Criança pequena não faz série de exercícios. Ela entra numa história.</h2>
+        <p class="lead">Em vez de contar repetições, a criança vira baleia, lebre ou castelo. O alongamento acontece porque ela quer saber o que vem depois.</p>
+        <div class="porque">
+          <article>
+            <div class="ico" style="background:#f3dcd3"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="7" r="3.5" fill="#b5543a"/><path d="M5 13c4 1.6 7.4 2.2 11 2.2s7-.6 11-2.2M16 15v6M16 21l-6 7M16 21l6 7" stroke="#b5543a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Corpo que se mexe</h3>
+            <p>Flexibilidade, equilíbrio e força de um jeito leve, adequado para a idade e sem competição.</p>
+          </article>
+          <article>
+            <div class="ico" style="background:#f6e6c4"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 7h9a3 3 0 0 1 3 3v16a3 3 0 0 0-3-3H6zM26 7h-5a3 3 0 0 0-3 3v16a3 3 0 0 1 3-3h5z" fill="none" stroke="#a97c25" stroke-width="2.6" stroke-linejoin="round"/></svg></div>
+            <h3>Imaginação que conduz</h3>
+            <p>A história mantém a atenção do começo ao fim e transforma cada posição numa cena que a criança lembra.</p>
+          </article>
+          <article>
+            <div class="ico" style="background:#dde7e4"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 27s-10-6-10-13a5.5 5.5 0 0 1 10-3.2A5.5 5.5 0 0 1 26 14c0 7-10 13-10 13z" fill="none" stroke="#5f7d77" stroke-width="2.6" stroke-linejoin="round"/></svg></div>
+            <h3>Tempo junto</h3>
+            <p>Cinco minutos que pais e filhos podem fazer lado a lado, longe das telas que só distraem.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao" id="desafios">
+      <div class="envolve">
+        <div class="faixa-familia">
+          <div>
+            <span class="olho">Desafios em família</span>
+            <h2>Menos de 30 segundos. Façam juntos.</h2>
+            <p>Desafios curtos para adulto e criança tentarem lado a lado. Quem consegue segurar o Aviãozinho?</p>
+          </div>
+          <div class="grade" id="grade-desafios">{desafios.map(v => <CardVideo video={v} />)}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao papel" id="adultos">
+      <div class="envolve">
+        <div class="cabeca">
+          <div>
+            <span class="olho">Para você, adulto</span>
+            <h2>Uma pausa para quem cuida</h2>
+            <p class="lead">Sequências rápidas para soltar o corpo depois de horas sentado. Cabem no intervalo do trabalho.</p>
+          </div>
+        </div>
+        <div class="duas" id="grade-adultos">{adultos.map(v => <CardVideo video={v} />)}</div>
+      </div>
+    </section>
+
+    <section class="secao" id="professora">
+      <div class="envolve professora">
+        <div class="foto"><img src={capa('rFX-Vw-cbz4', 'maxresdefault')} alt="A professora do Flex Família alongando num tapete azul, ao ar livre" /></div>
+        <div>
+          <span class="olho">Quem conduz as histórias</span>
+          <h2>A professora do Flex Família</h2>
+          <p class="lead">Ela junta alongamento e contação de histórias para que as crianças se movimentem brincando, com movimentos pensados para cada idade.</p>
+          <blockquote>"Flexibilidade para a família toda."</blockquote>
+          <div class="inscrever">
+            <a class="bt bt-primario" href={CANAL_INSCREVER} target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" fill="currentColor"/><path d="M10 9l5 3-5 3z" fill="#b5543a"/></svg>Inscreva-se no canal</a>
+            <small>Novas histórias chegam primeiro no YouTube.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Rodape />
+  <PlayerSobreposto />
+</Base>
